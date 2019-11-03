@@ -1,14 +1,24 @@
 ## チャットを作ろう
-ここからはWEBアプリの中身をプログラミングしてきます。  
+ここからはWEBアプリのファイルを追加・修正しプログラミングしていきましょう。  
 
+---
 ### ①リアルタイムWeb機能を実装
 ［Ctrl］＋［C］ WEBアプリのバッチジョブは停止し、リアルタイムWeb機能のモジュールを追加します。  
 ```
 $ npm i -S socket.io
 ```
 
-#### VSCdodeで修正
-次に「learning」を読み込み、VSCdodeで修正できるようにします。  
+#### npm
+npmとはNode Package Managerの略でNode.jsのライブラリやパッケージを
+管理する為のツールです。  
+上記はコマンドは`npm install --save socket.io`の短縮で  
+インストールとセーブをnpmの後ろに指定することで様々な機能を簡単に追加できます。
+
+---
+### ②VSCdodeにサーバーディレクトリを読み込む
+
+次に「learning」を読み込み、VSCdodeで修正できるようにします。 
+手順は以下の通り行います。   
 1. 「Explorer」を選択する  
 2. 「Open Folder」ボタンを押す  
  ![img](./img/contents/vs-2.png "img")  
@@ -19,11 +29,40 @@ $ npm i -S socket.io
 4. 「learning」フォルダの中身が表示される  
  ![img](./img/contents/vs-3.png "img")  
 
-#### 修正するファイル
+---
+### ③修正ファイルの役割
+今は「Welcome to Express」と表示されている画面を以下のファイルを修正して行くことで  
+チャットへと変身させていきます。  
+対象のファイルです。  
 ・views/index.ejs  
 ・route/index.js  
 ・bin/www
-  
+
+#### ejsファイル
+ejsは (Embedded JavaScript templates)の略です。  
+テンプレートエンジンと言われているファイルでexpressの環境を    
+構築した時に以下のコマンドで使えるようにしています。  
+`express --view=ejs`  
+クライアントサイドのhtmlファイルと同等の役割があり、サーバーサイドから  
+このファイルに対して動的な値を渡すことができるようになります。  
+(例)`<h1><%= title %></h1>`と記述しておくと   
+サーバーで以下のように`title`に`Express`文字を設定すると    
+```
+res.render('index', { title: 'Express' });
+```
+画面に描画される時に`title`は`Express`という文字に変換されます。    
+
+#### jsファイル
+サーバーサイドの処理を担うファイルです。  
+
+#### wwwファイル
+サーバーを起動させたり、環境設定をしたりアプリケーションの根幹を担うファイルです。  
+
+---
+### ④ファイルの修正を行う
+ここからはプログラミングになります。まずはアプリを構築していく全体の流れを掴む為に  
+内容に沿ってコーディングしていきましょう。
+
 #### views/index.ejsを修正
 変更前
 ```
@@ -51,6 +90,7 @@ $ npm i -S socket.io
   <body>
     <h1><%= title %></h1>
     <p>Welcome to <%= title %></p>
+    <!-- 追加 start-->
     <input type="text" id="message" size="80" maxlength="100">
     <button>send message</button>
     <div>
@@ -69,6 +109,7 @@ $ npm i -S socket.io
       $('div').append('<p>' + param + '</p>'); 
     });
     </script>
+    <!-- 追加 end-->
   </body>
 </html>
 ```
@@ -94,7 +135,9 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
+  // 修正 start
   res.render('index', { title: 'chat' });
+  // 修正 end
 });
 
 module.exports = router;
@@ -110,10 +153,6 @@ module.exports = router;
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
-
-/**
- * Normalize a port into a number, string, or false.
- */
 ```
 ↓
 変更後
@@ -126,6 +165,7 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
+// 追加 start
 var socketIO = require('socket.io');
 var io = socketIO.listen(server);
 io.on('connection', function(socket) {
@@ -133,19 +173,22 @@ io.on('connection', function(socket) {
     socket.broadcast.emit('response', param);
   });
 });
+// 追加 end
 ```
 
-修正を反映するためにWEBサーバーの再起動をする。  
-(サーバーサイドのファイルを修正した場合は必ず反映するために再起動を行います。)
+修正を反映するためにWEBサーバーの再起動をします。  
+サーバーサイドのファイル(*.js、www)を修正した場合は必ず再起動をしてください。
 ```
+［Ctrl］＋［C］
 $ SET DEBUG=learning:* & npm start
 ```
-WEBアプリへアクセスし以下の画面が表示すれば修正完了です。  
+WEBアプリへアクセスし以下の画面が表示すればコーディング成功です。  
 
  ![img](./img/contents/sc.png "img")
   
-### ②リアルタイム通信をしてみる
-
+---
+### ⑤アプリでリアルタイム通信をしてみる
+手順は以下の通り  
 1.ブラウザを画面に並列に配置する  
 
  ![img](./img/contents/sc-bo.png "img")
@@ -156,6 +199,9 @@ WEBアプリへアクセスし以下の画面が表示すれば修正完了で�
 3.両方のブラウザにメッセージが表示される。 
  ![img](./img/contents/sc-me.png "img")
 
-### チャレンジ
-*** localhostをコンピュータのIPアドレスに変更しスマホや他のPCからお互いに通信できるのでやって見ましょう。 ***
-  
+---
+### 演習チャレンジ
+*** アドレスバーのlocalhostをIPアドレスに変更しスマホや他のPCからお互いに通信できるのでやって見ましょう。 ***
+
+---
+ 
