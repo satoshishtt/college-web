@@ -1,12 +1,18 @@
 ## CSSで画面のデザインをしよう
 
-CSSとはスタイルシートとも呼ばれデザインや見栄えを整える言語
+先ほど軽く触れましたがCSSとはスタイルシートとも呼ばれデザインや見栄えを整える言語です。  
+ファイルの拡張子は「css」になります。
 
+---
 ### ①画面カラーと吹き出しの作成
+今の画面のままでは、ちょっとデザインが味気ないのでクライアントサイドのファイルを修正し  
+画面のデザインを変更していきます。
+
 #### 修正するファイル
 ・public/stylesheets/style.css  
 ・views/index.ejs  
 
+---
 #### public/stylesheets/style.cssを修正
 変更前
 ```
@@ -25,13 +31,16 @@ a {
 body {
   padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  /* 追加 start */
   background: #d7ebfe;
+  /* 追加 end */
 }
 
 a {
   color: #00B7FF;
 }
 
+/* 追加 start */
 .serif-left {
   display: block;
   position: relative; 
@@ -75,8 +84,9 @@ a {
   margin: 1.5em 0;
   overflow: hidden;
 }
-
+/* 追加 end */
 ```
+
 ### views/index.ejsを修正
 変更前
 ```
@@ -87,9 +97,11 @@ a {
 ↓
 変更後
 ```
+    <!-- 修正 start -->
     <div class="scenery">
       <p class="serif-left">Hi, I am John. I am your student today. Talk to you soon!</p>
     </div>
+    <!-- 修正 end -->
 ```
 変更前
 ```
@@ -107,15 +119,24 @@ a {
 ```
     $('button').on('click', function() {
       var text = $('#message').val();
+      // 修正 start
       $('.scenery').append('<p class="serif-right">' + text + '</p>'); 
+      // 修正 end
       socket.emit('request', text);
     });
     socket.on('response', function(param) {
+      // 修正 start
       $('.scenery').append('<p class="serif-left">' + param + '</p>'); 
+      // 修正 end
     });
 ```
+#### 画面のリロード
+アプリの画面に戻り吹き出しが表示されているか確認してみましょう。
 
+---
 ### ②画像を表示
+次に画像を表示するようにします。
+
 #### 修正するファイル
 ・public/stylesheets/style.css  
 ・views/index.ejs  
@@ -123,9 +144,9 @@ a {
 ・public/images/right.png *新規追加  
 
 #### public/stylesheets/style.cssを修正
-↓
-変更後 以下を最後に追加
+以下を最後に追加する
 ```
+/* 追加 start */
 .scenery .faceicon-left {
   float: left;
   margin-right: -90px;
@@ -145,6 +166,7 @@ a {
   border: solid 3px #d7ebfe;
   border-radius: 50%;
 }
+/* 追加 end */
 ```
 
 #### views/index.ejsを修正
@@ -159,7 +181,9 @@ a {
 変更後
 ```
     <div class="scenery">
+        <!-- 修正 start -->
         <img class="faceicon-left" border="0" src="/images/left.png">
+        <!-- 修正 end -->
         <p class="serif-left">Hi, I am John. I am your student today. Talk to you soon!</p>
     </div>
 ```
@@ -180,13 +204,21 @@ a {
 ```
     $('button').on('click', function() {
       var text = $('#message').val();
+      // 修正 start
       $('.scenery').append('<img class="faceicon-right" border="0" src="/images/right.png">'); 
+      // 修正 end
       $('.scenery').append('<p class="serif-right">' + text + '</p>'); 
       socket.emit('request', text);
     });
     socket.on('response', function(param) {
+      // 修正 start
       $('.scenery').append('<img class="faceicon-left" border="0" src="/images/left.png">'); 
+      // 修正 end
       $('.scenery').append('<p class="serif-left">' + param + '</p>'); 
     });
 ```
-  
+#### 画面のリロード
+アプリの画面に画像が表示されているか確認してみましょう。
+
+---
+
